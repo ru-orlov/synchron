@@ -34,7 +34,7 @@ else
 fi
 
 # Приветствие
-zenity --info --text="Вас приветствует программа установки и настройки вашего собственного облачного хранилища SYNCHRON!" --height=200 --width=300
+zenity --info --text="Вас приветствует программа установки и настройки вашего собственного облачного хранилища Nextcloud!" --height=200 --width=300
 
 # Проверка интернета
 check_internet
@@ -91,11 +91,11 @@ EOF"
     # Запрос данных для базы данных и сервера
     form_data=$(zenity --forms --title="Введите данные" --text="Введите данные для базы данных и сервера:" \
         --add-password="Введите пароль для администратора базы данных (root)" \
-        --add-entry="Введите имя базы данных для создания (synchron)" \
-        --add-entry="Введите имя пользователя для базы данных (synchron)" \
+        --add-entry="Введите имя базы данных для создания (nextcloud)" \
+        --add-entry="Введите имя пользователя для базы данных (nextcloud)" \
         --add-password="Введите пароль для пользователя базы данных" \
-        --add-entry="Введите имя вашего будущего облачного сервера (FQDN): synchron.domain.ru" \
-        --add-entry="Введите краткое имя сервера: synchron")
+        --add-entry="Введите имя вашего будущего облачного сервера (FQDN): nextcloud.domain.ru" \
+        --add-entry="Введите краткое имя сервера: nextcloud")
 
     # Разбиение строки с данными на отдельные переменные
     password_base=$(echo "$form_data" | awk -F '|' '{print $1}')
@@ -106,14 +106,14 @@ EOF"
     small_fqdn=$(echo "$form_data" | awk -F '|' '{print $6}')
 
     # Установка значений по умолчанию, если поля пустые
-    if [ -z "$name_base" ]; then name_base="synchron"; fi
-    if [ -z "$name_user_base" ]; then name_user_base="synchron"; fi
+    if [ -z "$name_base" ]; then name_base="nextcloud"; fi
+    if [ -z "$name_user_base" ]; then name_user_base="nextcloud"; fi
 
     # Сохранение данных на рабочем столе
     REAL_USER=${SUDO_USER:-$USER}
     DESKTOP_DIR="/home/$REAL_USER/Desktop"
     sudo_run "mkdir -p '$DESKTOP_DIR'"
-    sudo_run "echo '=== ДАННЫЕ ДЛЯ УСТАНОВКИ SYNCHRON ===' > '$DESKTOP_DIR/info.txt'"
+    sudo_run "echo '=== ДАННЫЕ ДЛЯ УСТАНОВКИ NEXTCLOUD ===' > '$DESKTOP_DIR/info.txt'"
     sudo_run "echo 'Имя базы данных: $name_base' >> '$DESKTOP_DIR/info.txt'"
     sudo_run "echo 'Пользователь БД: $name_user_base' >> '$DESKTOP_DIR/info.txt'"
     sudo_run "echo 'Пароль пользователя БД: $password_user_base' >> '$DESKTOP_DIR/info.txt'"
@@ -175,8 +175,8 @@ EOF"
         sudo_run "mkdir -p /etc/nginx/ssl"
         sudo_run "openssl req -new -x509 -days 3650 -nodes -out /etc/nginx/ssl/cert.pem -keyout /etc/nginx/ssl/cert.key -subj \"/C=RU/ST=Moscow/L=Moscow/O=Astra Linux/OU=IT Department/CN=$fqdn/CN=$small_fqdn\""
 
-        echo "Настройка Nginx для Synchron..."
-        sudo_run "cat > /etc/nginx/sites-available/synchron <<'EOF'
+        echo "Настройка Nginx для Nextcloud..."
+        sudo_run "cat > /etc/nginx/sites-available/nextcloud <<'EOF'
 upstream php-handler {
     server unix:/run/php/php${PHP_VER}-fpm.sock;
 }
@@ -206,7 +206,7 @@ server {
     add_header X-XSS-Protection \"1; mode=block\" always;
     add_header X-Robots-Tag \"noindex, nofollow\" always;
 
-    root /var/www/synchron;
+    root /var/www/nextcloud;
     client_max_body_size 16G;
     fastcgi_buffers 64 4K;
 
@@ -268,32 +268,32 @@ server {
 EOF"
 
         # Активация конфигурации
-        sudo_run "ln -sf /etc/nginx/sites-available/synchron /etc/nginx/sites-enabled/"
+        sudo_run "ln -sf /etc/nginx/sites-available/nextcloud /etc/nginx/sites-enabled/"
         sudo_run "rm -f /etc/nginx/sites-enabled/default"
 
         # Отключение Apache
         sudo_run "systemctl stop apache2 2>/dev/null || true"
         sudo_run "systemctl disable apache2 2>/dev/null || true"
 
-        echo "Скачивание Synchron (форк Nextcloud)..."
+        echo "Скачивание nextcloud (форк Nextcloud)..."
         # Скачивание с вашего репозитория
-        sudo_run "wget -O /tmp/synchron.zip https://github.com/ru-orlov/synchron/archive/refs/heads/main.zip"
-        sudo_run "unzip -q /tmp/synchron.zip -d /tmp/"
-        sudo_run "rm -rf /var/www/synchron 2>/dev/null || true"
-        sudo_run "mv /tmp/synchron-main /var/www/synchron"
-        sudo_run "rm /tmp/synchron.zip"
+        sudo_run "wget -O /tmp/nextcloud.zip https://github.com/ru-orlov/nextcloud/archive/refs/heads/main.zip"
+        sudo_run "unzip -q /tmp/nextcloud.zip -d /tmp/"
+        sudo_run "rm -rf /var/www/nextcloud 2>/dev/null || true"
+        sudo_run "mv /tmp/nextcloud-main /var/www/nextcloud"
+        sudo_run "rm /tmp/nextcloud.zip"
 
         # Настройка прав
         echo "Настройка прав доступа..."
-        sudo_run "mkdir -p /var/www/synchron/data"
-        sudo_run "mkdir -p /var/www/synchron/config"
-        sudo_run "chown -R www-data:www-data /var/www/synchron"
-        sudo_run "chmod -R 755 /var/www/synchron"
-        sudo_run "chmod -R 770 /var/www/synchron/data"
-        sudo_run "chmod -R 770 /var/www/synchron/config"
+        sudo_run "mkdir -p /var/www/nextcloud/data"
+        sudo_run "mkdir -p /var/www/nextcloud/config"
+        sudo_run "chown -R www-data:www-data /var/www/nextcloud"
+        sudo_run "chmod -R 755 /var/www/nextcloud"
+        sudo_run "chmod -R 770 /var/www/nextcloud/data"
+        sudo_run "chmod -R 770 /var/www/nextcloud/config"
 
         # Настройка cron для фоновых задач
-        sudo_run "echo '*/5 * * * * www-data php -f /var/www/synchron/cron.php > /dev/null 2>&1' > /etc/cron.d/synchron"
+        sudo_run "echo '*/5 * * * * www-data php -f /var/www/nextcloud/cron.php > /dev/null 2>&1' > /etc/cron.d/nextcloud"
 
         # Перезапуск сервисов
         echo "Завершение настройки..."
@@ -301,20 +301,20 @@ EOF"
         sudo_run "systemctl restart nginx"
 
         # Создание occ алиаса для удобства
-        sudo_run "echo 'alias synchron-occ=\"sudo -u www-data php /var/www/synchron/occ\"' > /etc/profile.d/synchron.sh"
-        sudo_run "chmod +x /etc/profile.d/synchron.sh"
+        sudo_run "echo 'alias nextcloud-occ=\"sudo -u www-data php /var/www/nextcloud/occ\"' > /etc/profile.d/nextcloud.sh"
+        sudo_run "chmod +x /etc/profile.d/nextcloud.sh"
 
         # Проверка установки
-        if [ -f /var/www/synchron/occ ]; then
+        if [ -f /var/www/nextcloud/occ ]; then
             exit_code=0
         else
             exit_code=1
         fi
 
-    ) | zenity --progress --pulsate --auto-close --title="Установка Synchron" --text="Установка облачного хранилища Synchron... Пожалуйста, подождите."
+    ) | zenity --progress --pulsate --auto-close --title="Установка nextcloud" --text="Установка облачного хранилища nextcloud... Пожалуйста, подождите."
 
     if [ $? -eq 0 ]; then
-        zenity --info --title="Успех" --text="Облачное хранилище Synchron успешно установлено!\n\nДанные для входа сохранены на рабочем столе в файле info.txt\n\nТеперь вам нужно открыть браузер и завершить установку, создав администратора."
+        zenity --info --title="Успех" --text="Облачное хранилище nextcloud успешно установлено!\n\nДанные для входа сохранены на рабочем столе в файле info.txt\n\nТеперь вам нужно открыть браузер и завершить установку, создав администратора."
 
         zenity --info --title="Информация" --text="Сейчас откроется браузер с вашим сервером. Завершите установку:\n1. Создайте учётную запись администратора\n2. Введите данные базы данных (они есть в info.txt)\n3. Нажмите 'Завершить установку'" --height=250 --width=400
 
