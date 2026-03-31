@@ -26,30 +26,10 @@ class SwitchUpdaterServer implements IRepairStep {
 	}
 
 	public function run(IOutput $output): void {
-		if ($this->config->getAppValue('support', 'SwitchUpdaterServerHasRun') === 'yes') {
-			$output->info('Repair step already executed');
-			return;
-		}
-
-		$currentUpdaterServer = $this->config->getSystemValue('updater.server.url', 'https://updates.nextcloud.com/updater_server/');
-		$subscriptionKey = $this->config->getAppValue('support', 'subscription_key', '');
-
-		/**
-		 * only overwrite the updater server if:
-		 * 	- it is the default one
-		 *  - there is a valid subscription
-		 *  - there is a subscription key set
-		 *  - the subscription key is halfway sane
-		 */
-		if ($currentUpdaterServer === 'https://updates.nextcloud.com/updater_server/' &&
-			$this->subscriptionRegistry->delegateHasValidSubscription() &&
-			$subscriptionKey !== '' &&
-			preg_match('!^[a-zA-Z0-9-]{10,250}$!', $subscriptionKey)
-		) {
-			$this->config->setSystemValue('updater.server.url', 'https://updates.nextcloud.com/customers/' . $subscriptionKey . '/');
-		}
-
-		// if everything is done, no need to redo the repair during next upgrade
-		$this->config->setAppValue('support', 'SwitchUpdaterServerHasRun', 'yes');
+		// [SYNCHRON/OFFLINE-MODE] External updater-server switching is disabled.
+		// This fork (ru-orlov/synchron) operates in manual-update mode only.
+		// No outbound calls to updates.nextcloud.com are made.
+		// See https://github.com/ru-orlov/synchron for update instructions.
+		$output->info('Updater server switching is disabled in offline/manual-update mode.');
 	}
 }
