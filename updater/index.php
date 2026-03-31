@@ -147,33 +147,13 @@ class Updater {
 	 * @throws \Exception
 	 */
 	public function checkForUpdate() {
-		$response = $this->getUpdateServerResponse();
-
-		$this->silentLog('[info] checkForUpdate() ' . print_r($response, true));
-
-		$version = isset($response['version']) ? (string)$response['version'] : '';
-		$versionString = isset($response['versionstring']) ? (string)$response['versionstring'] : '';
-
-		if ($version !== '' && $version !== $this->currentVersion) {
-			$this->updateAvailable = true;
-			$releaseChannel = $this->getCurrentReleaseChannel();
-			$updateText = 'Update to ' . htmlentities($versionString) . ' available. (channel: "' . htmlentities($releaseChannel) . '")<br /><span class="light">Following file will be downloaded automatically:</span> <code class="light">' . (string)$response['url'] . '</code>';
-
-			// only show changelog link for stable releases (non-RC & non-beta)
-			if (!preg_match('!(rc|beta)!i', $versionString)) {
-				$changelogURL = $this->getChangelogURL(substr($version, 0, strrpos($version, '.') ?: 0));
-				$updateText .= '<br /><a class="external_link" href="' . $changelogURL . '" target="_blank" rel="noreferrer noopener">Open changelog ↗</a>';
-			}
-		} else {
-			$updateText = 'No update available.';
-		}
-
-		if ($this->updateAvailable && isset($response['autoupdater']) && !($response['autoupdater'] === 1 || $response['autoupdater'] === '1')) {
-			$this->updateAvailable = false;
-
-			$updateText .= '<br />The updater is disabled for this update - please update manually.';
-		}
-
+		// [SYNCHRON/OFFLINE-MODE] No outbound update checks. Manual updates only.
+		// getUpdateServerResponse() always returns [] in this fork.
+		$this->silentLog('[info] checkForUpdate() manual-update mode');
+		$this->updateAvailable = false;
+		$updateText = 'Automatic update checks are disabled in this fork.<br />'
+			. '<a class="external_link" href="manual_update.php" rel="noreferrer noopener">'
+			. 'View manual update instructions ↗</a>';
 		$this->silentLog('[info] end of checkForUpdate() ' . $updateText);
 		return $updateText;
 	}
@@ -488,9 +468,8 @@ class Updater {
 
 	private function getChangelogURL(string $versionString): string {
 		$this->silentLog('[info] getChangelogURL()');
-		$changelogWebsite = 'https://nextcloud.com/changelog/';
-		$changelogURL = $changelogWebsite . '#' . str_replace('.', '-', $versionString);
-		return $changelogURL;
+		// [SYNCHRON/OFFLINE-MODE] Changelog links point to the fork repository.
+		return 'https://github.com/ru-orlov/synchron/blob/main/README.md';
 	}
 
 	/**
@@ -498,56 +477,11 @@ class Updater {
 	 */
 	private function getUpdateServerResponse(): array {
 		$this->silentLog('[info] getUpdateServerResponse()');
-
-		$updaterServer = $this->getConfigOptionString('updater.server.url');
-		if ($updaterServer === null) {
-			// FIXME: used deployed URL
-			$updaterServer = 'https://updates.nextcloud.com/updater_server/';
-		}
-		$this->silentLog('[info] updaterServer: ' . $updaterServer);
-
-		$releaseChannel = $this->getCurrentReleaseChannel();
-		$this->silentLog('[info] releaseChannel: ' . $releaseChannel);
-		$this->silentLog('[info] internal version: ' . $this->getConfigOptionMandatoryString('version'));
-
-		$updateURL = $updaterServer . '?version='. str_replace('.', 'x', $this->getConfigOptionMandatoryString('version')) .'xxx'.$releaseChannel.'xx'.urlencode($this->buildTime).'x'.PHP_MAJOR_VERSION.'x'.PHP_MINOR_VERSION.'x'.PHP_RELEASE_VERSION;
-		$this->silentLog('[info] updateURL: ' . $updateURL);
-
-		// Download update response
-		$curl = curl_init();
-		curl_setopt_array($curl, [
-			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_URL => $updateURL,
-			CURLOPT_USERAGENT => 'Nextcloud Updater',
-		]);
-
-		if ($this->getConfigOption('proxy') !== null) {
-			curl_setopt_array($curl, [
-				CURLOPT_PROXY => $this->getConfigOptionString('proxy'),
-				CURLOPT_PROXYUSERPWD => $this->getConfigOptionString('proxyuserpwd'),
-				CURLOPT_HTTPPROXYTUNNEL => $this->getConfigOption('proxy') ? 1 : 0,
-			]);
-		}
-
-		/** @var false|string $response */
-		$response = curl_exec($curl);
-		if ($response === false) {
-			throw new \Exception('Could not do request to updater server: '.curl_error($curl));
-		}
-		curl_close($curl);
-
-		// Response can be empty when no update is available
-		if ($response === '') {
-			return [];
-		}
-
-		$xml = simplexml_load_string($response);
-		if ($xml === false) {
-			throw new \Exception('Could not parse updater server XML response');
-		}
-		$response = get_object_vars($xml);
-		$this->silentLog('[info] getUpdateServerResponse response: ' . print_r($response, true));
-		return $response;
+		// [SYNCHRON/OFFLINE-MODE] No outbound network calls are made to update servers.
+		// This fork (ru-orlov/synchron) operates in manual-update mode only.
+		// See https://github.com/ru-orlov/synchron for release downloads.
+		$this->silentLog('[info] getUpdateServerResponse: manual-update mode, returning empty response');
+		return [];
 	}
 
 	/**

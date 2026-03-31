@@ -39,7 +39,7 @@ Step-by-Step Manual Upgrade
 1. Back up your existing Nextcloud Server database, data directory, and 
    ``config.php`` file. (See :doc:`backup`, for restore information see :doc:`restore`)
 
-2. Choose a target Nextcloud Server release from `<https://nextcloud.com/changelog/>`_ and 
+2. Choose a target Synchron release from `<https://github.com/ru-orlov/synchron/blob/main/README.md>`_ and 
    download the Archive file (tarball or zip archive) into an empty directory outside of 
    your current installation. 
    
@@ -124,8 +124,8 @@ ones are enabled. Re-enable your third-party apps.
 Previous Nextcloud releases
 ---------------------------
 
-You'll find previous Nextcloud releases in the `Nextcloud Server Changelog 
-<https://nextcloud.com/changelog/>`_.
+You'll find previous Synchron releases in the `Synchron fork README 
+<https://github.com/ru-orlov/synchron/blob/main/README.md>`_.
 
 Troubleshooting
 ---------------
@@ -135,7 +135,7 @@ help::
 
  sudo -u www-data php console.php files:scan --all
 
-See `the nextcloud.com support page <https://nextcloud.com/support/>`_ for further
+See `the Synchron fork README <https://github.com/ru-orlov/synchron/blob/main/README.md>`_ for further
 resources.
 
 Sometimes, Nextcloud can get *stuck in a upgrade* if the web based upgrade
@@ -153,6 +153,6 @@ If this does not work properly, try the repair function::
  sudo -u www-data php occ maintenance:repair
 
 
-.. _nextcloud.com/install/:
-   https://nextcloud.com/install/  
+.. _synchron-readme:
+   https://github.com/ru-orlov/synchron/blob/main/README.md
   

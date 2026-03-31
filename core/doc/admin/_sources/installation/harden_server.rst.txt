@@ -253,44 +253,14 @@ security headers are shipped.
 Connections to remote servers
 -----------------------------
 
-Some functionalities require the Nextcloud server to be able to connect remote systems via https/443.
-This pragraph also includes the data which is being transmitted to the Nextcloud GmbH.
-Depending on your server setup, these are the possible connections:
+.. note::
+   In this fork (Synchron / ru-orlov/synchron), all outbound connections to Nextcloud GmbH servers
+   are disabled. The only external link referenced is https://github.com/ru-orlov/synchron.
+   Update checks, app store checks, telemetry, and federation lookups to Nextcloud-operated
+   servers are all turned off by default. See the fork README for details:
+   https://github.com/ru-orlov/synchron/blob/main/README.md
 
-- nextcloud.com, startpage.com, eff.org, edri.org
-	- `optional (config)`_
-	- for checking the internet connection
-- cloud.nextcloud.com
-	- used for enterprise license monitoring
-	- submitted data: subscription key, user count
-- updates.nextcloud.com
-	- to check for available Nextcloud server updates
-	- submitted data: server version, subscription key, install time, instance id, instance size
-- apps.nextcloud.com
-	- to check for available apps and their updates 
-	- submitted data: subscription key
-- github.com, objects.githubusercontent.com
-	- to download Nextcloud standard apps
-- push-notifications.nextcloud.com
-	- sending push notifications to mobile clients
-	- submitted data: unique device identifier, public key, push token
-- pushfeed.nextcloud.com
-	- optional
-	- checking for updates to be shown in the Nextcloud Announcements app
-- lookup.nextcloud.com
-	- optional
-	- for updating and lookups to the federated sharing addressbook
-	- submitted data: *pending*
-- surveyserver.nextcloud.com
-	- optional
-	- if the admin has agreed to share anonymized server data
-	- submitted data: statistical data. see here for the `detailed field list`_
-- Any remote Nextcloud server that is connected with federated sharing
-
-.. _optional (config): https://docs.nextcloud.com/server/31/admin_manual/configuration_server/config_sample_php_parameters.html#has-internet-connection
-.. _detailed field list : https://github.com/nextcloud/survey_client
-
-.. TODO ON RELEASE: Update version number above on release
+.. _synchron-readme: https://github.com/ru-orlov/synchron/blob/main/README.md
 
 
 Setup fail2ban

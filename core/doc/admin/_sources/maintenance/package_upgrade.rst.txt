@@ -26,7 +26,7 @@ $ sudo snap install nextcloud
 
 **All other distros**
 
-(`be warned <https://github.com/nextcloud-snap/nextcloud-snap/wiki/Why-Ubuntu-is-the-only-supported-distro/>`_)
+(`be warned <https://github.com/ru-orlov/synchron/blob/main/README.md>`_)
 
 * Go to https://docs.snapcraft.io/installing-snapd/6735
 * Type the command to install snapd
@@ -109,8 +109,8 @@ If you did **not** install via a Snap package:
 #. Run upgrade routine
 #. Repeat from step 2 until you reach the last available major release
 
-You'll find previous Nextcloud releases in the `Nextcloud Server Changelog 
-<https://nextcloud.com/changelog/>`_.
+You'll find previous Synchron releases in the `Synchron fork README 
+<https://github.com/ru-orlov/synchron/blob/main/README.md>`_.
 
 If upgrading via your Snap package manager fails, then you must perform a 
 :doc:`manual_upgrade`.

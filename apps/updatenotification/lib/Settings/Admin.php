@@ -52,16 +52,16 @@ class Admin implements ISettings {
 			$channels[] = 'git';
 		}
 
+		// [SYNCHRON/OFFLINE-MODE] Update checks are disabled; this fork uses manual updates only.
+		// The updateChecker will always return an empty state because VersionCheck::check() is a no-op.
 		$updateState = $this->updateChecker->getUpdateState();
 
 		$notifyGroups = json_decode($this->config->getAppValue('updatenotification', 'notify_groups', '["admin"]'), true);
 
-		$defaultUpdateServerURL = 'https://updates.nextcloud.com/updater_server/';
-		$updateServerURL = $this->config->getSystemValue('updater.server.url', $defaultUpdateServerURL);
-		$defaultCustomerUpdateServerURLPrefix = 'https://updates.nextcloud.com/customers/';
-
-		$isDefaultUpdateServerURL = $updateServerURL === $defaultUpdateServerURL
-			|| strpos($updateServerURL, $defaultCustomerUpdateServerURLPrefix) === 0;
+		// [SYNCHRON/OFFLINE-MODE] No external update server URLs are used.
+		// Updates for this fork are available at https://github.com/ru-orlov/synchron
+		$updateServerURL = 'https://github.com/ru-orlov/synchron';
+		$isDefaultUpdateServerURL = false;
 
 		$hasValidSubscription = $this->subscriptionRegistry->delegateHasValidSubscription();
 
